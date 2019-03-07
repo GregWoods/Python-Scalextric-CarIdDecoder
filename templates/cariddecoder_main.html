@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="static/fallback.min.js"></script>
+
+    <script>
+        fallback.load({
+            bootstrapcss: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css',
+                'static/bootstrap.min.css'
+            ],
+            jQuery: [
+                'https://code.jquery.com/jquery-3.3.1.min.js',
+                'static/jquery-3.3.1.min.js'
+            ],
+            bootstrap: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js',
+                'static/bootstrap.min.js',
+            ]
+        });
+
+        fallback.ready(function () {
+            // All of my libraries have finished loading
+            // Execute my code that applies to all of my libraries here!
+
+            //when any of the inputs changes, fire off an ajax call which changes 
+            //  the equivalent global varibales in decoder.py
+            $("input[name='recordOptions']").on("change", function(e){
+                $.get("/record/" + e.target.value);
+            });   
+
+            $("input[name='carIdOptions']").on("change", function(e){
+                $.get("/carid/" + e.target.value);
+            });  
+
+            $("input[name='chipOptions']").on("change", function(e){
+                $.get("/chip/" + e.target.value);
+            });              
+
+            $("input[name='firmwareOptions']").on("change", function(e){
+                $.get("/firmware/" + e.target.value);
+            });  
+        });
+
+
+        
+    </script>
+    <style>
+    
+    </style>
+    <title>CarId Decoder - New Session</title>
+  </head>
+  <body>
+    
+
+
+    <form>
+        <div class="container">
+
+            <h1>CarId Decoder</h1>
+            <h2>Test Setup</h2>
+
+            <div class="form-group">
+                <label for="StartStopBtnGrp">Recording</label>
+                <div id="StartStopBtnGrp" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-primary {% if record == True %} active {% endif %}">
+                        <input type="radio" name="recordOptions" id="recordOn" value="on" {% if record == True %} checked {% endif %} >On
+                    </label>
+                    <label class="btn btn-primary {% if record == False %} active {% endif %}">
+                        <input type="radio" name="recordOptions" id="recordOff" value="off" {% if record == False %} checked {% endif %} >Off
+                    </label>
+                 </div>
+            </div>
+
+
+            <div class="form-group">
+                <label>CarId 
+                    <div id="caridButtonGrp" class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary {% if carId == 1 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid1" value="1" {% if carId == 1 %} checked {% endif %}>1
+                        </label>
+                        <label class="btn btn-secondary {% if carId == 2 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid2" value="2" {% if carId == 2 %} checked {% endif %}>2
+                        </label>
+                        <label class="btn btn-secondary {% if carId == 3 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid3" value="3" {% if carId == 3 %} checked {% endif %}>3
+                        </label>
+                        <label class="btn btn-secondary {% if carId == 4 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid4" value="4" {% if carId == 4 %} checked {% endif %}>4
+                        </label>
+                        <label class="btn btn-secondary {% if carId == 5 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid5" value="5" {% if carId == 5 %} checked {% endif %}>5
+                        </label>
+                        <label class="btn btn-secondary {% if carId == 6 %} active {% endif %}">
+                            <input type="radio" name="carIdOptions" id="carid6" value="6" {% if carId == 6 %} checked {% endif %}>6
+                        </label>                
+                    </div>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="ChipRevBtnGrp">Chip Rev.</label>
+                <div id="ChipRevBtnGrp" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary {% if chip == 'F' %} active {% endif %}">
+                        <input type="radio" name="chipOptions" id="chipF" value="F" {% if chip == 'F' %} checked {% endif %}>F
+                    </label>
+                    <label class="btn btn-secondary {% if chip == 'G' %} active {% endif %}">
+                        <input type="radio" name="chipOptions" id="chipG" value="G" {% if chip == 'G' %} checked {% endif %}>G
+                    </label>
+                    <label class="btn btn-secondary {% if chip == 'H' %} active {% endif %}">
+                        <input type="radio" name="chipOptions" id="chipH" value="H" {% if chip == 'H' %} checked {% endif %}>H
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ChipRevBtnGrp">Firmware</label>
+                <div id="Firmware" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary {% if firmware == 'std' %} active {% endif %}">
+                        <input type="radio" name="firmwareOptions" id="Std" value="std" {% if firmware == 'std' %} checked {% endif %}>Standard
+                    </label>
+                    <label class="btn btn-secondary {% if firmware == 'icp33' %} active {% endif %}">
+                        <input type="radio" name="firmwareOptions" id="icp33" value="icp33" {% if firmware == 'icp33' %} checked {% endif %}>InCarPro 3.3
+                    </label>
+                    <label class="btn btn-secondary {% if firmware == 'icp40' %} active {% endif %}">
+                        <input type="radio" name="firmwareOptions" id="icp40" value="icp40" {% if firmware == 'icp40' %} checked {% endif %}> InCarPro 4.0
+                    </label>
+                </div>              
+            </div> 
+
+        </div>
+    </form>
+
+  </body>
+</html>

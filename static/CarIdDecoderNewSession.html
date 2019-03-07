@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="fallback.min.js"></script>
+
+    <script>
+        fallback.load({
+            bootstrapcss: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css',
+                'bootstrap.min.css'
+            ],
+            jQuery: [
+                'https://code.jquery.com/jquery-3.3.1.min.js',
+                'jquery-3.3.1.min.js'
+            ],
+            bootstrap: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js',
+                'bootstrap.min.js',
+            ]
+        });
+
+        fallback.ready(function () {
+            // All of my libraries have finished loading
+            // Execute my code that applies to all of my libraries here!
+            //alert('all loaded');
+        });
+    </script>
+    <style>
+    
+    </style>
+    <title>CarId Decoder - New Session</title>
+  </head>
+  <body>
+    
+
+
+    <form>
+        <div class="container">
+
+            <h1>CarId Decoder</h1>
+            <h2>Test Setup</h2>
+                    
+            <div class="form-group">
+                <label>CarId 
+                    <div id="caridButtonGrp" class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid1">1
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid2">2
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid3">3
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid4">4
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid5">5
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="options" id="carid6">6
+                        </label>                
+                    </div>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="ChipRevBtnGrp">Chip Rev.</label>
+                <div id="ChipRevBtnGrp" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="chipF">F
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="chipG">G
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="chipH">H
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ChipRevBtnGrp">Firmware</label>
+                <div id="Firmware" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="Std">Standard
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="icp33">InCarPro 3.3
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="icp40">InCarPro 4.0
+                    </label>
+                </div>              
+            </div> 
+
+            <button type="submit" class="btn btn-primary">Start Test</button>
+        </div>
+    </form>
+
+  </body>
+</html>

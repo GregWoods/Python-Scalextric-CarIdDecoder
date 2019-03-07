@@ -1,0 +1,277 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="fallback.min.js"></script>
+
+    <script>
+        fallback.load({
+            bootstrapcss: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css',
+                'bootstrap.min.css'
+            ],
+            jQuery: [
+                'https://code.jquery.com/jquery-3.3.1.min.js',
+                'jquery-3.3.1.min.js'
+            ],
+            bootstrap: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js',
+                'bootstrap.bundle.min.js'
+            ]
+        });
+
+        fallback.ready(function () {
+            // All of my libraries have finished loading
+            // Execute my code that applies to all of my libraries here!
+            //alert('all loaded');
+        });
+    </script>
+
+<style>
+        tr#car1 {
+            background-color: rgb(255, 206, 206);
+        }
+        tr#car1 button {
+            background-color: rgb(155, 0, 0);
+            color: white;
+        }
+        tr#car2 {
+            background-color: rgb(198, 200, 255);
+        }
+        tr#car2 button {
+            background-color: rgb(8, 0, 155);
+            color: white;
+        }
+        tr#car3 {
+            background-color: rgb(198, 253, 200);
+        }
+        tr#car3 button {
+            background-color: rgb(10, 102, 2);
+            color: white;
+        }
+        tr#car4 {
+            background-color: rgb(252, 193, 138);
+        }
+        tr#car4 button {
+            background-color: rgb(201, 122, 4);
+            color: white;
+        }
+        tr#car5 {
+            background-color: rgb(169, 169, 169);
+        }
+        tr#car5 button {
+            background-color: rgb(252, 252, 252);
+            color: black;
+        }
+        tr#car6 {
+            background-color: rgb(254, 255, 173);
+        }
+        tr#car6 button {
+            background-color: rgb(255, 224, 51);
+            color: black;
+        }
+
+
+
+
+
+        body {
+            background-color: grey;
+        }
+
+        #outer {
+            padding: 0px;
+            background-color: white;
+        }
+        
+        .header {
+            background-color: #555;
+            padding-top: 0.7em;
+            padding-bottom: 0.7em;
+        }
+        
+        #table-container {
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+        }
+
+
+        tr {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        td,
+        th {
+            text-align: center!important;
+            padding: 0.3em;
+        }
+
+        td {
+            font-size: 1.7em;
+        }
+
+        td.btn-penalty button {
+            width:100%;
+            margin: 0.1em 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+
+        #moduleType {
+            width: 100%;
+            color: #CCC;
+        }
+
+        #modeName {
+            font-weight: bold;
+            color: white;
+            font-size: 3em
+        }
+
+        #settings svg {
+            height: auto;
+            width: 2.7em;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        #settingsInfo {
+            padding: 0.5em 0 0.5em 0;
+        }
+        #settingsInfo ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #settingsInfo li {
+            font-size: 0.95em;
+        }
+        .h1, .h2 {
+            display:inline;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="outer" class="container">
+        <!--
+        <div class="row">
+            <div class="col-xs-1">xs1</div>
+
+        </div>
+        -->
+        <div class="container">
+            <div class="row header">
+                <div class="col-12">
+     
+                    <a id="settings" href="#" alt="Settings" style="float:right">
+                        <svg id="icon-settings" fill="#CCC" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+                            />
+                        </svg>
+                    </a>
+                                
+                    <h1 id="moduleType" class="h2">Smart Pit</h1><br>
+                    <h2 id="modeName" class="h1">Penalties</h2>
+                </div>
+
+            </div>
+
+            <div id="settingsInfo" class="row">
+                <div class="col-12">
+                    <ul>
+                        <li>Penalties: 0:03 &rarr; 0:03 &rarr; 0:05 &rarr; 0:10 &rarr; DSQ</li>
+                        <li>Penalty increases by 0:01 for each lap it is not taken</li>
+                        <li>Next Penalty decreases every 5 clean laps</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="table-container">
+
+            <table>
+                <thead>
+                    <th class="btn-penalty">Add Penalty</th>
+                    <th class="">Remaining</th>
+                    <th class="">Taken</th>
+                    <th class="">Best Run</th>
+                    <th class="info-next-penalty">Next Penalty</th>
+                </thead>
+                <tbody>
+                    <tr id="car1">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">1</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:10</td>
+                        <td class="info-penalty-taken">0:11</td>
+                        <td class="info-max-clean-laps">2</td>
+                        <td class="info-next-penalty">DSQ</td>
+                    </tr>
+                    <tr id="car2">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">2</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:00</td>
+                        <td class="info-penalty-taken">0:06</td>
+                        <td class="info-max-clean-laps">3</td>
+                        <td class="info-next-penalty">0:05</td>
+                    </tr>
+                    <tr id="car3">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">3</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:00</td>
+                        <td class="info-penalty-taken">0:00</td>
+                        <td class="info-max-clean-laps">17</td>
+                        <td class="info-next-penalty">0:03</td>
+                    </tr>
+                    <tr id="car4">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">4</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:12</td>
+                        <td class="info-penalty-taken">0:00</td>
+                        <td class="info-max-clean-laps">7</td>
+                        <td class="info-next-penalty">0:05</td>
+                    </tr>
+                    <tr id="car5">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">5</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:14</td>
+                        <td class="info-penalty-taken">0:00</td>
+                        <td class="info-max-clean-laps">7</td>
+                        <td class="info-next-penalty">0:10</td>
+                    </tr>
+                    <tr id="car6">
+                        <td class="btn-penalty">
+                            <button class="btn" type="button">6</button>
+                        </td>
+                        <td class="info-penalty-remaining">0:13</td>
+                        <td class="info-penalty-taken">0s</td>
+                        <td class="info-max-clean-laps">7</td>
+                        <td class="info-next-penalty">0:08</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</body>
+
+</html>
