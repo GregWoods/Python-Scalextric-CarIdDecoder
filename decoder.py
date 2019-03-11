@@ -46,7 +46,7 @@ longPulseMinValue = LONGPULSEMAX
 longPulseMaxValue = LONGPULSEMIN
 
 saveAfterTimestamp = 0
-IDLE_BEFORE_SAVE = 3
+IDLE_BEFORE_SAVE = 3        # 3 seconds when testing with a pushbutton. Needs to be < 1 second when testing carIds, and much shorter if this code is ever used for lapcounting etc.
 
 
 
@@ -99,6 +99,10 @@ def setFirmware(firmware):
 @app.route("/plot")
 def showGraph():
     # generate png here, save it to temp folder, then pass the name of the png to the template
+
+    # Simple SQL to group the pulseWidths into bins:
+    #   select round(pulseWidth, 2), count(*) from pulses
+    #   group by round(pulseWidth, 2);
 
     n, bins, patches = plt.hist(x=myLog, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
     # plt.grid(axis='y', alpha=0.75)
@@ -153,9 +157,10 @@ def saveData():
     global saveAfterTimestamp 
     
     with apsw.Connection("carid-pulses-sqlite.db") as conn:
-       cursor = conn.cursor()
-       cursor.execute("""CREATE TABLE IF NOT EXISTS pulses (
+        cursor = conn.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS pulses (
                            id INTEGER PRIMARY KEY,
+                           sampleId INTEGER,
                            created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
                            carid INTEGER, 
                            chip TEXT,
@@ -163,8 +168,14 @@ def saveData():
                            pulseWidth REAL,
                            pulseLogic INTEGER
                            )""")
+        cursor.execute("SELECT MAX(sampleId) FROM pulses")
+        sampleId = cursor.fetchone()[0]
+        if sampleId is None:
+            sampleId = 0
 
     print("saveData thread READY!")
+    print("Next sampleId: ")
+    print (sampleId)
 
     while True:
         time.sleep(1)     # relinquish control to other threads
@@ -175,8 +186,10 @@ def saveData():
             if settings["record"] == True:
                 
                 global logCounter
-                
-                sqlintro = "INSERT INTO pulses (carid, chip, firmware, pulseWidth, pulseLogic) values \n"
+
+                sampleId += 1
+
+                sqlintro = "INSERT INTO pulses (sampleId, carid, chip, firmware, pulseWidth, pulseLogic) values \n"
                 sqlvalues = []
 
                 carId = settings["carId"]
@@ -184,7 +197,7 @@ def saveData():
                 firmware = settings["firmware"]
                 
                 for (pulseWidth, pulseLogic) in myLog:
-                    sqlvalues.append("('{}', '{}', '{}', '{}', '{}')".format(carId, chip, firmware, pulseWidth, pulseLogic))
+                    sqlvalues.append("('{}', '{}', '{}', '{}', '{}', '{}')".format(sampleId, carId, chip, firmware, pulseWidth, pulseLogic))
         
                 sql = sqlintro + "\n, ".join(sqlvalues)
 
