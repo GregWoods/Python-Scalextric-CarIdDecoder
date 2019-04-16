@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="static/fallback.min.js"></script>
+
+    <script>
+        fallback.load({
+            bootstrapcss: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css',
+                'static/bootstrap.min.css'
+            ],
+            jQuery: [
+                'https://code.jquery.com/jquery-3.3.1.min.js',
+                'static/jquery-3.3.1.min.js'
+            ],
+            bootstrap: [
+                'https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js',
+                'static/bootstrap.min.js',
+            ]
+        });
+
+        fallback.ready(function () {
+            // All of my libraries have finished loading
+            // Execute my code that applies to all of my libraries here!
+
+            //when any of the inputs changes, fire off an ajax call which changes 
+            //  the equivalent global varibales in decoder.py
+            $("input[name='recordOptions']").on("change", function(e){
+                $.get("/record/" + e.target.value);
+            });   
+
+            $("input[name='carIdOptions']").on("change", function(e){
+                $.get("/carid/" + e.target.value);
+            });  
+
+            $("input[name='chipOptions']").on("change", function(e){
+                $.get("/chip/" + e.target.value);
+            });              
+
+            $("input[name='firmwareOptions']").on("change", function(e){
+                $.get("/firmware/" + e.target.value);
+            });  
+        });
+
+
+        
+    </script>
+    <style>
+    
+    </style>
+    <title>CarId Decoder - Plot Results</title>
+  </head>
+  <body>
+    
+    <img src="{{ ploturl }}" />
+
+</body>
+</html>
