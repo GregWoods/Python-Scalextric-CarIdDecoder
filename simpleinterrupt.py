@@ -118,7 +118,7 @@ wiringpi.wiringPiISR(SENSOR, wiringpi.INT_EDGE_BOTH, logMe)
 
 def threaded_function(arg):
     for i in range(arg):
-        print "running"
+        print("running")
         sleep(1)
 
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     thread = Thread(target = threaded_function, args = (10, ))
     thread.start()
     thread.join()
-    print "thread finished...exiting"
+    print("thread finished...exiting")
 
 
 def main(stdscr):

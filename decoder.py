@@ -17,12 +17,12 @@ app = Flask(__name__)
 # global variables
 settings = {
     "record" : True,
-    "carId" : 1,
+    "carId" : 6,
     "chip" : "G", 
     "firmware" : "icp40"
 }
 
-logSize = 7000
+logSize = 10000
 myLog = []
 logCounter = 0
 
@@ -31,22 +31,17 @@ SENSOR = 3      #WiringPi pin3. Use gpio readall for ascii digram of all pins
 
 lastPerfCounter = 0.0
 
-SHORTPULSEMIN = 0.000030  # 30ms or 0.00003s or 30000ns
-SHORTPULSEMAX = 0.000070
 LONGPULSEMIN =  0.000100
 LONGPULSEMAX =  0.000500
-RECORDINGDURATION = 1          # no pulses after X seconds, write pulses to log file
 
 shortPulseCount = 0
 shortPulseTotal = 0
 
 longPulseCount = 0
 longPulseTotal = 0
-longPulseMinValue = LONGPULSEMAX
-longPulseMaxValue = LONGPULSEMIN
 
-saveAfterTimestamp = 0
-IDLE_BEFORE_SAVE = 3        # 3 seconds when testing with a pushbutton. Needs to be < 1 second when testing carIds, and much shorter if this code is ever used for lapcounting etc.
+saveAfterTimestamp = time.time()      # tracks the future time when we expect a database write to occur. Uses Epoch time (1970)
+IDLE_BEFORE_SAVE = 1        # no pulses after X seconds, write pulses to database
 
 
 
@@ -100,31 +95,60 @@ def setFirmware(firmware):
 def showGraph():
     # generate png here, save it to temp folder, then pass the name of the png to the template
 
-    # Simple SQL to group the pulseWidths into bins:
-    #   select round(pulseWidth, 2), count(*) from pulses
-    #   group by round(pulseWidth, 2);
+    colors = ['red', 'blue', 'yellow', 'green', 'orange', 'grey']
 
-    n, bins, patches = plt.hist(x=myLog, bins='auto', color='#0504aa', alpha=0.7, rwidth=0.85)
-    # plt.grid(axis='y', alpha=0.75)
-    # plt.xlabel('Value')
-    # plt.ylabel('Frequency')
-    # plt.title('My Very Own Histogram')
-    # plt.text(23, 45, r'$\mu=15, b=3$')
-    # maxfreq = n.max()
+    #set up the shared bins for all plots
+    with apsw.Connection("carid-pulses-sqlite.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("""select min(pulseWidth) * 1000000, max(pulsewidth) * 1000000 from pulses 
+                              where pulseWidth < 1""")
+            minPulseWidth, maxPulseWidth = cursor.fetchall()[0]
+    print(minPulseWidth)
+    print(maxPulseWidth)
 
-    # Set a clean upper y-axis limit.
-    # plt.ylim(top=np.ceil(maxfreq / 10) * 10 if maxfreq % 10 else maxfreq + 10)            
+    # Set figure width to 12 and height to 9
+    plt.rcParams["figure.figsize"] = [15, 9]
 
-    plt.savefig("myplot.png")
-    # , dpi=None, facecolor='w', edgecolor='w',
-    #         orientation='portrait', papertype=None, format=None,
-    #         transparent=False, bbox_inches=None, pad_inches=0.1,
-    #         frameon=None)
-    plt.show()
+    binWidth = 1       # 10uS (=0.000010S)
+    bins = np.arange(minPulseWidth, maxPulseWidth + binWidth, binWidth)
+
+    # up to 7 (exclusive)
+    for carid in range(1,7):
+
+        with apsw.Connection("carid-pulses-sqlite.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("""select pulseWidth * 1000000 from pulses 
+                                where pulseWidth < 1 and carId = """ + str(carid))
+            plotData = cursor.fetchall()
+
+            # tuple keyword ensures we iterate through the zip object, and [0] prevents a tuple inside a tuple
+            if (len(plotData) > 0):
+                xdata = tuple(zip(*plotData))[0]
+
+                #  https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html
+                plt.hist(x=xdata, bins=bins, rwidth=1, color=colors[carid-1])
+
+
+
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+
+    model = {
+        "ploturl" : "static/plot-" + timestamp + ".png" 
+    }
+
+
+
+    plt.savefig(model["ploturl"])
+    #  , dpi=None, facecolor='w', edgecolor='w',
+    #          orientation='portrait', papertype=None, format=None,
+    #          transparent=False, bbox_inches=None, pad_inches=0.1,
+    #          frameon=None)
+    #  plt.show()
     plt.close()
 
-    plotdata = {"ploturl" : "myplot.png"}
-    return render_template('plot.html', **plotdata)
+    return render_template('plot.html', **model)
+
+
 
 def logMe():
     global logCounter
@@ -134,22 +158,24 @@ def logMe():
     # thread.stop()
     now = time.perf_counter()
     pulseDuration = now - lastPerfCounter
-    pulseLogic = wiringpi.digitalRead(SENSOR)
 
-    print("pulse detected", pulseLogic)
+    # pulseLogic = wiringpi.digitalRead(SENSOR)     # too slow. Cannot detect ID 1,2 if this line is present
+    pulseLogic = 99
 
-    # if pulse < LONGPULSEMAX and pulse > SHORTPULSEMIN:
-    if logCounter <= logSize and lastPerfCounter > 0:
-        myLog.append((pulseDuration, pulseLogic))
+    #if LONGPULSEMIN < pulseDuration < LONGPULSEMAX:
+    if pulseDuration < LONGPULSEMAX:
+        if logCounter <= logSize and lastPerfCounter > 0:
+            myLog.append((pulseDuration, pulseLogic))
+            logCounter += 1
+
+            # every time a pulse is detected, set the saveAfterTimestamp to now + x seconds
+            #   this ensures that the lengthy save process is idle until capturing has been 
+            #   stopped for x seconds
+            global saveAfterTimestamp 
+            saveAfterTimestamp = now + IDLE_BEFORE_SAVE
 
     lastPerfCounter = now
-    logCounter += 1
     
-    # every time a pulse is detected, set the saveAfterTimestamp to now + x seconds
-    #   this ensures that the lengthy save process is idle until capturing has been 
-    #   stopped for x seconds
-    global saveAfterTimestamp 
-    saveAfterTimestamp = time.perf_counter() + IDLE_BEFORE_SAVE
 
 
 # runs in a separate process. Make sure it is idle most of the time
@@ -179,7 +205,7 @@ def saveData():
 
     while True:
         time.sleep(1)     # relinquish control to other threads
-
+        print('condition1: ', time.perf_counter() > saveAfterTimestamp, '. len(myLog): ', len(myLog))
         if (time.perf_counter() > saveAfterTimestamp 
             and len(myLog) > 0):
 
@@ -204,10 +230,12 @@ def saveData():
                 cursor.execute(sql)        
 
                 myLog.clear()
-                print("INSERT finished")
+                logCounter = 0
+                print('INSERT finished. CarId: ', carId, '. Last PulseWidth: ', pulseWidth, '. SampleID: ', sampleId)
                  
             else:
                 myLog.clear()
+                logCounter = 0
                 print("No insert, Recording is OFF")
         
 # Flask
@@ -219,8 +247,8 @@ def do_something_only_once():
 
 # setup interrupt handler
 wiringpi.wiringPiSetup()
-wiringpi.pullUpDnControl(SENSOR, wiringpi.PUD_UP) ;
-wiringpi.wiringPiISR(SENSOR, wiringpi.INT_EDGE_BOTH, logMe)
+wiringpi.pullUpDnControl(SENSOR, wiringpi.PUD_UP)
+wiringpi.wiringPiISR(SENSOR, wiringpi.INT_EDGE_RISING, logMe)
 
 
 
