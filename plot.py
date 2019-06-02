@@ -1,23 +1,33 @@
+import numpy as np      # requires: sudo apt-get install libatlas-base-dev
+import matplotlib.pyplot as plt
+import apsw     # Another Python SQLite Wrapper
+from datetime import date, datetime
 
 
 
-
-def showGraph():
+def generate():
     # generate png here, save it to temp folder, then pass the name of the png to the template
 
     colors = ['red', 'blue', 'yellow', 'green', 'orange', 'grey']
 
     #set up the shared bins for all plots
-    with apsw.Connection("carid-pulses-sqlite.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("""select min(pulseWidth) * 1000000, max(pulsewidth) * 1000000 from pulses 
-                              where pulseWidth < 1""")
-            minPulseWidth, maxPulseWidth = cursor.fetchall()[0]
+    #  Now we know the range of values, we hardcode the plot size to make reading it easier
+    # with apsw.Connection("carid-pulses-sqlite.db") as conn:
+    #        cursor = conn.cursor()
+    #        cursor.execute("""select min(pulseWidth) * 1000000, max(pulsewidth) * 1000000 from pulses 
+    #                          where pulseWidth < 1""")
+    #        minPulseWidth, maxPulseWidth = cursor.fetchall()[0]
+    minPulseWidth = 100
+    maxPulseWidth = 500
     print(minPulseWidth)
     print(maxPulseWidth)
+    
+    # pixels / dpi
+    imgWidth = 1200 / 96    
+    imgHeight = 800 / 96
 
     # Set figure width to 12 and height to 9
-    plt.rcParams["figure.figsize"] = [15, 9]
+    plt.rcParams["figure.figsize"] = [imgWidth, imgHeight]
 
     binWidth = 1       # 10uS (=0.000010S)
     bins = np.arange(minPulseWidth, maxPulseWidth + binWidth, binWidth)
@@ -54,4 +64,4 @@ def showGraph():
     #  plt.show()
     plt.close()
 
-    return render_template('plot.html', **model)
+

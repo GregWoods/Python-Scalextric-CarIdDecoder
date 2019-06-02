@@ -5,8 +5,6 @@ import os.path
 import apsw     # Another Python SQLite Wrapper
 from datetime import date, datetime
 import wiringpi
-import numpy as np      # requires: sudo apt-get install libatlas-base-dev
-import matplotlib.pyplot as plt
 
 
 # global variables

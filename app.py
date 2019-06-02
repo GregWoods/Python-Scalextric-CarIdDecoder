@@ -5,7 +5,8 @@ import os
 
 from decoder import settings
 import decoder
-import tests
+import algconsecutivematches
+import plot
 
 
 app = Flask(__name__)
@@ -66,21 +67,23 @@ def tests():
 
 @app.route("/plot/latest")
 def showGraph():
-    plotPngs = glob.glob('./static/plot-*.png')
-    latestPlot = max(plotPngs, key=os.path.getctime)
-    print(latestPlot)
+    plotPngs = glob.glob('static/plot-*.png')      #doesn't check specifically for images in the static folder
+    latestPlot = '/' + max(plotPngs, key=os.path.getctime)
+    print("=== " + latestPlot + " ===")
 
     model = {
         "ploturl" : latestPlot 
     }   
     # TODO: add "Refresh" button to plot.html
-    return render_template('plot.html', **model)
+    # TODO: show the generated date time on the page (get it from the png filename)
+    return render_template('/plot.html', **model)
 
 
 @app.route("/plot/refresh")
-def newPlot:
-    pass
-
+def newPlot():
+    plot.generate()
+    # TODO: redirect to /plot/latest would be better
+    return showGraph()
 
 
 # Flask
