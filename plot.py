@@ -4,6 +4,28 @@ import apsw     # Another Python SQLite Wrapper
 from datetime import date, datetime
 
 
+def getAllData():
+    output = []
+
+    # up to 7 (exclusive)
+    for carid in range(1,7):
+
+        with apsw.Connection("carid-pulses-sqlite.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("""select round(pulseWidth * 1000000, 0) from pulses 
+                                where pulseWidth < 1 and carId = """ + str(carid))
+            plotData = cursor.fetchall()
+
+            # tuple keyword ensures we iterate through the zip object, and [0] prevents a tuple inside a tuple
+            if (len(plotData) > 0):
+                d = {
+                        'carid': carid,
+                        'data': tuple(zip(*plotData))[0]
+                    }
+                output.append(d)
+    return output
+
+
 
 def generate():
     # generate png here, save it to temp folder, then pass the name of the png to the template

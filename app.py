@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, after_this_request
 from threading import Thread
 import glob
 import os
@@ -86,11 +86,27 @@ def newPlot():
     return showGraph()
 
 
+@app.route("/plot/d3")
+def d3Plot():
+    model = {
+        "somedata" : "" 
+    }      
+    return render_template('/d3.html', **model)
+
+
+@app.route("/data/all")
+def allData():
+    d = plot.getAllData()
+    return jsonify(d)
+
+
+
+
+
 # Flask
 @app.before_first_request
 def do_something_only_once():
     pass
-
 
 
 
