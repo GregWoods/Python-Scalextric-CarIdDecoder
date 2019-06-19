@@ -1,5 +1,5 @@
-import numpy as np      # requires: sudo apt-get install libatlas-base-dev
-import matplotlib.pyplot as plt
+# import numpy as np      # requires: sudo apt-get install libatlas-base-dev
+# import matplotlib.pyplot as plt
 import apsw     # Another Python SQLite Wrapper
 from datetime import date, datetime
 
@@ -26,7 +26,7 @@ def getAllData():
     return output
 
 
-
+'''
 def generate():
     # generate png here, save it to temp folder, then pass the name of the png to the template
 
@@ -85,5 +85,5 @@ def generate():
     #          frameon=None)
     #  plt.show()
     plt.close()
-
+    '''
 

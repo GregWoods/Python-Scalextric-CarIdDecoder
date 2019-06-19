@@ -5,6 +5,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <style>
+    div.tooltip {	
+        position: absolute;			
+        text-align: center;			
+        width: 60px;					
+        height: 28px;					
+        padding: 2px;				
+        font: 12px sans-serif;		
+        background: lightsteelblue;	
+        border: 0px;		
+        border-radius: 8px;			
+        pointer-events: none;			
+    }    
+    </style>
+
     <script src="/static/fallback.min.js"></script>
 
     <script>
@@ -27,81 +42,140 @@
             ]      
         });
 
+
+
         fallback.ready(function () {
+            console.log("READY");
             // All of my libraries have finished loading
             // Execute my code that applies to all of my libraries here!
 
-            //get plot data
-            $.ajax('http://10.0.1.105:8081/data/all').done(function(d) {
-                console.log("first pulse: " + d[0].data[0]);
-            });
+            // Define the div for the tooltip
+            var div = d3.select("body").append("div")	
+                .attr("class", "tooltip")				
+                .style("opacity", 0);
+
+            // set the dimensions and margins of the graph
+            var margin = {top: 10, right: 30, bottom: 30, left: 40};
+            var width = 1600;
+            var height = 600;
+
+            var colours = [
+                { 'name' : 'red'}
+            ]
+            
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_dataviz")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+            // get the data - using es6 promises
+            var jsonPromise = d3.json("http://10.0.1.105:8081/data/all");
+
+            jsonPromise.then(onJsonResolved, onJsonRejected);
+
+            function onJsonResolved(d) {
+                console.log("DATA Fetched. resolvedValue: " + d);
+                
+                // X axis: scale and draw:
+                //TODO: pass in the domain min and max from the database
+                var x = d3.scaleLinear()
+                    .domain([100, 500])      //the range of the data
+                    .range([0, width]);     //the size of the plot on screen
+
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+                
+                // set the parameters for the histogram
+                var histogram = d3.histogram()
+                    .value(d => d)
+                    .domain(x.domain())
+                    .thresholds(400);
+                
+                var bins = [];
+                overallLongestBar = 0;
+                
+                //populate all the bins and calc longest bar
+                for (const [idx, item] of d.entries()) {
+                    // And apply this function to data to get the bins
+                    bins[idx] = histogram(item.data);
+                    const longestBar = d3.max(bins[idx], y => y.length);
+                    if (longestBar > overallLongestBar)
+                    {
+                        overallLongestBar = longestBar;
+                    }
+                }
+
+                var y = d3.scaleLinear()
+                        .range([height, 0])
+                        .domain([0, overallLongestBar]);  
+
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+
+                for (const [idx, item] of bins.entries()) {
+                    const carId = idx + 1;
+
+                    // append the bar rectangles to the svg element
+                    svg.selectAll("rectasfasfs")    //makes no difference what you put in the SelectAll(): https://www.d3-graph-gallery.com/graph/histogram_double.html
+                        .data(bins[idx])
+                        .enter()
+                        .append("rect")
+                            .attr("x", 1)
+                            .attr("transform", function(i) { return "translate(" + x(i.x0) + "," + y(i.length) + ")"; })
+                            .attr("width", function(i) { return x(i.x1) - x(i.x0); })
+                            .attr("height", function(i) { return height - y(i.length); })
+                            .attr("class", "carId" + carId)
+                            .on("mouseover", function(i) {		
+                                div.transition()		
+                                    .duration(200)		
+                                    .style("opacity", .9);		
+                                div	.html("Value: " + i + "<br/>")	
+                                    .style("left", (d3.event.pageX) + "px")		
+                                    .style("top", (d3.event.pageY - 28) + "px");	
+                                })					
+                            .on("mouseout", function(d) {		
+                                div.transition()		
+                                    .duration(500)		
+                                    .style("opacity", 0);	
+                            });
+                }
+            }
 
         });
+
+        function onJsonRejected(errData) {
+            console.log("Error retreiving json data");
+        }
+
     </script>
-
-
-    <script>
-
-    // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 40},
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
-    
-    // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
-      .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
-    
-    // get the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv", function(data) {
-    
-      // X axis: scale and draw:
-      var x = d3.scaleLinear()
-          .domain([0, 1000])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-          .range([0, width]);
-      svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
-    
-      // set the parameters for the histogram
-      var histogram = d3.histogram()
-          .value(function(d) { return d.price; })   // I need to give the vector of value
-          .domain(x.domain())  // then the domain of the graphic
-          .thresholds(x.ticks(70)); // then the numbers of bins
-    
-      // And apply this function to data to get the bins
-      var bins = histogram(data);
-    
-      // Y axis: scale and draw:
-      var y = d3.scaleLinear()
-          .range([height, 0]);
-          y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
-      svg.append("g")
-          .call(d3.axisLeft(y));
-    
-      // append the bar rectangles to the svg element
-      svg.selectAll("rect")
-          .data(bins)
-          .enter()
-          .append("rect")
-            .attr("x", 1)
-            .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-            .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
-            .attr("height", function(d) { return height - y(d.length); })
-            .style("fill", "#69b3a2")
-    
-    });
-    </script>
-
 
     <style>
-    
+        .carId1 {
+            fill: rgb(155, 0, 0);
+        }
+        .carId2 {
+            fill: rgb(8, 0, 155);
+        }
+        .carId3 {
+            fill: rgb(10, 102, 2);
+        }
+        .carId4 {
+            fill: rgb(201, 122, 4);
+        }
+        .carId5 {
+            fill: rgb(140, 140, 140);
+        }
+        .carId6 {
+            fill: rgb(255, 224, 51);
+        } 
     </style>
-    <title>CarId Decoder - New Session</title>
+    <title>CarId Plot All Pulses</title>
   </head>
   <body>
     
