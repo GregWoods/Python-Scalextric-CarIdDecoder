@@ -4,7 +4,30 @@ import apsw     # Another Python SQLite Wrapper
 from datetime import date, datetime
 
 
-def getAllData():
+
+def getAllData
+    # check the db to get date range and number of samples for ALL data
+    # does a cached file exist for that date range and samples count? (filename /data/fromDate-ToDate-NumberOfSamples.js)
+
+    # if not, generate it
+    allDataJson = createAllDataJson()
+
+    # save it to /data folder (pref gzipped)
+
+    # stream (if poss) the data from the /data/20190101-20190630-12233.js as the response
+    
+    # save it, gzipped
+
+
+    # return the data. (We pref need to stream this directly as the response rather than poss it around in memory)
+    #   maybe that bit is done in app.py
+    return allDataJson
+
+
+
+# TODO: it would be better to stream this straight to the file system (pref as gzipped file)
+# try   https://realpython.com/read-write-files-python/
+def createAllDataJson():
     output = []
 
     # up to 7 (exclusive)

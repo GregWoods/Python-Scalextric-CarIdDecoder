@@ -72,6 +72,9 @@
                     .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
 
+            //NEW: data/all still returns the data, but now, behind the scenes, it will read it from a cached and gzipped 
+            //  file. If that fie didn't exist, it will be generated, ad then the data will be returned.
+
             // get the data - using es6 promises
             var jsonPromise = d3.json("http://10.0.1.105:8081/data/all");
 

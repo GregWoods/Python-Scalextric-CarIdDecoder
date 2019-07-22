@@ -65,6 +65,7 @@ def tests():
     return render_template('test1.html', **model)
 
 
+# python graph generation is DEPRECATED
 @app.route("/plot/latest")
 def showGraph():
     plotPngs = glob.glob('static/plot-*.png')      #doesn't check specifically for images in the static folder
@@ -79,6 +80,7 @@ def showGraph():
     return render_template('/plot.html', **model)
 
 
+# used?
 @app.route("/plot/refresh")
 def newPlot():
     plot.generate()
@@ -94,12 +96,18 @@ def d3Plot():
     return render_template('/d3.html', **model)
 
 
+# to be DEPRECATED
 @app.route("/data/all")
 def allData():
     d = plot.getAllData()
     return jsonify(d)
 
 
+@app.route("/data/cacheall")
+def cacheAllData():
+    # (for now) do all this in plot.py (rename it later)
+    cachedFilename = plot.getCachedFilename(longAgo, farFuture)
+    return cachedFilename
 
 
 
